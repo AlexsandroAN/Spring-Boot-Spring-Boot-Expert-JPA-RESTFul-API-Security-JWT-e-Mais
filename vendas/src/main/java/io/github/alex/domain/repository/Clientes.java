@@ -2,21 +2,29 @@ package io.github.alex.domain.repository;
 
 import io.github.alex.domain.entity.Cliente;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  *
  * @author Alex
  */
-public interface Clientes extends JpaRepository<Cliente, Integer > {
+public interface Clientes extends JpaRepository<Cliente, Integer> {
 
     List<Cliente> findByNomeLike(String nome);
 
     boolean existsByNome(String nome);
+
+    @Query(value = " select * from cliente c where c.nome like '%:nome%' ", nativeQuery = true)
+    List<Cliente> encontrarPorNome(@Param("nome") String nome);
+
+    @Query(" delete from Cliente c where c.nome =:nome ")
+    @Modifying
+    void deleteByNome(String nome);
+
+    @Query(" select c from Cliente c left join fetch c.pedidos where c.id = :id  ")
+    Cliente findClienteFetchPedidos(@Param("id") Integer id);
 
 }
