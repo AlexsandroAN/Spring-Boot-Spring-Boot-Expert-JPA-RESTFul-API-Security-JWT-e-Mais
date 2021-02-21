@@ -1,5 +1,6 @@
 package io.github.alex.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,7 +19,7 @@ import javax.persistence.Table;
 @Table(name = "cliente")
 public class Cliente {
 
-    @Id
+  @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private Integer id;
@@ -26,7 +27,8 @@ public class Cliente {
     @Column(name = "nome", length = 100)
     private String nome;
 
-    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
+    @JsonIgnore
+    @OneToMany( mappedBy = "cliente" , fetch = FetchType.LAZY )
     private Set<Pedido> pedidos;
 
     public Cliente() {
@@ -67,9 +69,9 @@ public class Cliente {
 
     @Override
     public String toString() {
-        return "Cliente{"
-                + "id=" + id
-                + ", nome='" + nome + '\''
-                + '}';
+        return "Cliente{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                '}';
     }
 }
