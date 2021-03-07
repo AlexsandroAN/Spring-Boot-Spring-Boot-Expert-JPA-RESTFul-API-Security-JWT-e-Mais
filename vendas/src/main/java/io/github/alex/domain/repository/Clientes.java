@@ -7,10 +7,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-/**
- *
- * @author Alex
- */
 public interface Clientes extends JpaRepository<Cliente, Integer> {
 
     List<Cliente> findByNomeLike(String nome);
