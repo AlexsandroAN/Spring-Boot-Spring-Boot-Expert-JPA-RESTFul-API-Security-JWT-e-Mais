@@ -1,23 +1,26 @@
-package io.github.alex.domain.service.impl;
+package io.github.alex.service.impl;
 
 import io.github.alex.api.dto.ItemPedidoDTO;
 import io.github.alex.api.dto.PedidoDTO;
-import io.github.alex.api.exception.RegraNegocioException;
+import io.github.alex.exception.RegraNegocioException;
 import io.github.alex.domain.entity.Cliente;
 import io.github.alex.domain.entity.ItemPedido;
 import io.github.alex.domain.entity.Pedido;
 import io.github.alex.domain.entity.Produto;
+import io.github.alex.domain.enums.StatusPedido;
 import io.github.alex.domain.repository.Clientes;
-import io.github.alex.domain.repository.ItensPedido;
 import io.github.alex.domain.repository.Pedidos;
 import io.github.alex.domain.repository.Produtos;
-import io.github.alex.domain.service.PedidoService;
+import io.github.alex.service.PedidoService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import io.github.alex.domain.repository.ItemsPedido;
+import io.github.alex.exception.PedidoNaoEncontradoException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +29,7 @@ public class PedidoServiceImpl implements PedidoService {
     private final Pedidos repository;
     private final Clientes clientesRepository;
     private final Produtos produtosRepository;
-    private final ItensPedido itemsPedidoRepository;
+    private final ItemsPedido itemsPedidoRepository;
 
     @Override
     @Transactional
@@ -40,12 +43,29 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setTotal(dto.getTotal());
         pedido.setDataPedido(LocalDate.now());
         pedido.setCliente(cliente);
+        pedido.setStatus(StatusPedido.REALIZADO);
 
         List<ItemPedido> itemsPedido = converterItems(pedido, dto.getItems());
         repository.save(pedido);
         itemsPedidoRepository.saveAll(itemsPedido);
         pedido.setItens(itemsPedido);
         return pedido;
+    }
+
+    @Override
+    public Optional<Pedido> obterPedidoCompleto(Integer id) {
+        return repository.findByIdFetchItens(id);
+    }
+
+    @Override
+    @Transactional
+    public void atualizaStatus(Integer id, StatusPedido statusPedido) {
+        repository
+                .findById(id)
+                .map(pedido -> {
+                    pedido.setStatus(statusPedido);
+                    return repository.save(pedido);
+                }).orElseThrow(() -> new PedidoNaoEncontradoException());
     }
 
     private List<ItemPedido> converterItems(Pedido pedido, List<ItemPedidoDTO> items) {

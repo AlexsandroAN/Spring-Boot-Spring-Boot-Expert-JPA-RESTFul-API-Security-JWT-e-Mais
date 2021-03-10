@@ -1,4 +1,4 @@
-package io.github.alex.api.exception;
+package io.github.alex.exception;
 
 public class RegraNegocioException extends RuntimeException {
 

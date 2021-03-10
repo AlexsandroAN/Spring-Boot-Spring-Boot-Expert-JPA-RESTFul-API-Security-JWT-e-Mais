@@ -1,14 +1,19 @@
 package io.github.alex.api.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemPedidoDTO {
+@Builder
+public class InformacaoItemPedidoDTO {
 
-    private Integer produto;
+    private String descricaoProduto;
+    private BigDecimal precoUnitario;
     private Integer quantidade;
 }
