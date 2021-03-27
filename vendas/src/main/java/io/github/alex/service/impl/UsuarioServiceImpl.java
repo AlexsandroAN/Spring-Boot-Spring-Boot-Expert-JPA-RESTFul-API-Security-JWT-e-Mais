@@ -1,5 +1,8 @@
 package io.github.alex.service.impl;
 
+import io.github.alex.domain.entity.Usuario;
+import io.github.alex.domain.repository.UsuarioRepository;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,22 +18,30 @@ import org.springframework.stereotype.Service;
 @Service
 public class UsuarioServiceImpl implements UserDetailsService {
 
-    @Autowired
+   @Autowired
     private PasswordEncoder encoder;
+
+    @Autowired
+    private UsuarioRepository repository;
+
+    @Transactional
+    public Usuario salvar(Usuario usuario){
+        return repository.save(usuario);
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Usuario usuario = repository.findByLogin(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado na base de dados."));
 
-        if (!username.endsWith("39091")) {
-            throw new UsernameNotFoundException("Usuário não encontrado na base.");
-
-        }
+        String[] roles = usuario.isAdmin() ?
+                new String[]{"ADMIN", "USER"} : new String[]{"USER"};
 
         return User
                 .builder()
-                .username("39091")
-                .password(encoder.encode("123"))
-                .roles("USER", "ADMIN")
+                .username(usuario.getLogin())
+                .password(usuario.getSenha())
+                .roles(roles)
                 .build();
     }
 
