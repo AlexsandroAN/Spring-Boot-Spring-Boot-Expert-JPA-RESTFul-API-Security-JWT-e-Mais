@@ -2,6 +2,10 @@ package io.github.alex.api.controller;
 
 import io.github.alex.domain.entity.Produto;
 import io.github.alex.domain.repository.Produtos;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
@@ -15,6 +19,7 @@ import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/api/produtos")
+@Api(value = "Produto", description = "REST API para Produto", tags = {"Produto"})
 public class ProdutoController {
 
     private Produtos repository;
@@ -25,12 +30,18 @@ public class ProdutoController {
 
     @PostMapping
     @ResponseStatus(CREATED)
+    @ApiOperation("Salva um novo Produto")
+    @ApiResponses({
+        @ApiResponse(code = 201, message = "Produto salvo com sucesso"),
+        @ApiResponse(code = 400, message = "Erro de validação")
+    })
     public Produto save(@RequestBody @Valid Produto produto) {
         return repository.save(produto);
     }
 
     @PutMapping("{id}")
     @ResponseStatus(NO_CONTENT)
+    @ApiOperation("Atualiza dados de um Produto")
     public void update(@PathVariable Integer id, @RequestBody @Valid Produto produto) {
         repository
                 .findById(id)
@@ -45,6 +56,7 @@ public class ProdutoController {
 
     @DeleteMapping("{id}")
     @ResponseStatus(NO_CONTENT)
+    @ApiOperation("Deleta um Produto")
     public void delete(@PathVariable Integer id) {
         repository
                 .findById(id)
@@ -57,6 +69,11 @@ public class ProdutoController {
     }
 
     @GetMapping("{id}")
+    @ApiOperation("Obter detalhes de um Produto")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Produto encontrado"),
+        @ApiResponse(code = 404, message = "Produto não encontrado para o ID informado")
+    })
     public Produto getById(@PathVariable Integer id) {
         return repository
                 .findById(id)
@@ -66,6 +83,7 @@ public class ProdutoController {
     }
 
     @GetMapping
+    @ApiOperation("Lista de Produto")
     public List<Produto> find(Produto filtro) {
         ExampleMatcher matcher = ExampleMatcher
                 .matching()

@@ -8,6 +8,10 @@ import io.github.alex.domain.entity.ItemPedido;
 import io.github.alex.domain.entity.Pedido;
 import io.github.alex.domain.enums.StatusPedido;
 import io.github.alex.service.PedidoService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/pedidos")
+@Api(value = "Pedido", description = "REST API para Pedido", tags = {"Pedido"})
 public class PedidoController {
 
     private PedidoService service;
@@ -37,12 +42,22 @@ public class PedidoController {
 
     @PostMapping
     @ResponseStatus(CREATED)
+    @ApiOperation("Salva um novo Pedido")
+    @ApiResponses({
+        @ApiResponse(code = 201, message = "Pedido salvo com sucesso"),
+        @ApiResponse(code = 400, message = "Erro de validação")
+    })
     public Integer save(@RequestBody @Valid PedidoDTO dto) {
         Pedido pedido = service.salvar(dto);
         return pedido.getId();
     }
 
     @GetMapping("{id}")
+    @ApiOperation("Obter detalhes de um Pedido")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Pedido encontrado"),
+        @ApiResponse(code = 404, message = "Produto não encontrado para o ID informado")
+    })
     public InformacoesPedidoDTO getById(@PathVariable Integer id) {
         return service
                 .obterPedidoCompleto(id)
@@ -53,6 +68,7 @@ public class PedidoController {
 
     @PatchMapping("{id}")
     @ResponseStatus(NO_CONTENT)
+    @ApiOperation("Atualiza Status de um Cliente")
     public void updateStatus(@PathVariable Integer id,
             @RequestBody AtualizacaoStatusPedidoDTO dto) {
         String novoStatus = dto.getNovoStatus();

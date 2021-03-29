@@ -2,12 +2,17 @@ package io.github.alex.api.controller;
 
 import io.github.alex.domain.entity.Cliente;
 import io.github.alex.domain.repository.Clientes;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/clientes")
+@Api(value = "Cliente", description = "REST API para Cliente", tags = {"Cliente"})
 public class ClienteController {
 
     private Clientes clientes;
@@ -30,7 +36,13 @@ public class ClienteController {
     }
 
     @GetMapping("{id}")
-    public Cliente getClienteById(@PathVariable Integer id) {
+    @ApiOperation("Obter detalhes de um Cliente")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Cliente encontrado"),
+        @ApiResponse(code = 404, message = "Cliente não encontrado para o ID informado")
+    })
+    public Cliente getClienteById(
+            @PathVariable @ApiParam("Id do Cliente") Integer id) {
         return clientes
                 .findById(id)
                 .orElseThrow(()
@@ -40,13 +52,19 @@ public class ClienteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("Salva um novo Cliente")
+    @ApiResponses({
+        @ApiResponse(code = 201, message = "Cliente salvo com sucesso"),
+        @ApiResponse(code = 400, message = "Erro de validação")
+    })
     public Cliente save(@RequestBody @Valid Cliente cliente) {
         return clientes.save(cliente);
     }
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Integer id) {
+    @ApiOperation("Deleta um Cliente")
+    public void delete(@PathVariable @ApiParam("Id do Cliente") Integer id) {
         clientes.findById(id)
                 .map(cliente -> {
                     clientes.delete(cliente);
@@ -59,6 +77,7 @@ public class ClienteController {
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiOperation("Atualiza dados de um Cliente")
     public void update(@PathVariable Integer id,
             @RequestBody @Valid Cliente cliente) {
         clientes
@@ -72,6 +91,7 @@ public class ClienteController {
     }
 
     @GetMapping
+    @ApiOperation("Lista de Clientes")
     public List<Cliente> find(Cliente filtro) {
         ExampleMatcher matcher = ExampleMatcher
                 .matching()
