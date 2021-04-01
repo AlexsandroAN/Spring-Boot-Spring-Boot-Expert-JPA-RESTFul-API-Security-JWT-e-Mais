@@ -12,19 +12,39 @@
     <artifactId>vendas</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>vendas</name>
+    <packaging>${project.packaging}</packaging> 
     <description>Vendas project for Spring Boot</description>
     <properties>
         <java.version>1.8</java.version>
-    </properties>
+    </properties> 
     
     <profiles>
+       <profile>
+            <activation>                
+                <activeByDefault>true</activeByDefault>                
+            </activation>          
+            <id>desenvolvimento</id>
+            <properties>
+                <project.packaging>jar</project.packaging>
+                <tomcat.scope>compile</tomcat.scope>
+            </properties>     
+        </profile> 
+               
+        <profile>
+            <id>producao</id>
+            <properties>
+                <project.packaging>war</project.packaging>
+                <tomcat.scope>provided</tomcat.scope>                
+            </properties>      
+        </profile>  
+
         <profile>
             <id>lombok-build</id>
             <properties>
                 <src.dir>${project.build.directory}/generated-sources/delombok</src.dir>
             </properties>
         </profile>
-    </profiles>
+    </profiles>  
 
     <dependencies>
         <dependency>
@@ -73,6 +93,15 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>2.9.2</version>
+        </dependency>
+        
+        <!-- Para Publicar em um servidor tomcat externo -->
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-tomcat -->
+      <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+             <version>2.4.4</version>
+            <scope>${tomcat.scope}</scope>
         </dependency>
         
         <dependency>
